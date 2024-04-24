@@ -8,6 +8,7 @@ const PORT: number = 8080;
 
 const prisma = new PrismaClient();
 
+// Get all todos
 app.get('/', async (req: Request, res: Response) => {
   try {
     const allTodo = await prisma.todo.findMany();
@@ -18,6 +19,7 @@ app.get('/', async (req: Request, res: Response) => {
   }
 });
 
+// Create a new todo
 app.post('/create', async (req: Request, res: Response) => {
   try {
     const { title, isCompleted } = req.body;
@@ -28,6 +30,25 @@ app.post('/create', async (req: Request, res: Response) => {
       },
     });
     return res.json(createTodo);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+// edit a todo
+app.put('/edit/:id', async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const { title, isCompleted } = req.body;
+    const editTodo = await prisma.todo.update({
+      where: { id },
+      data: {
+        title,
+        isCompleted,
+      },
+    });
+    return res.json(editTodo);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: 'Something went wrong' });
